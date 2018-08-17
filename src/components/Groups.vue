@@ -44,12 +44,6 @@ export default class Groups extends Vue {
         }
     }
 
-    /*getGroups() {
-        return this.groups.length ? this.groups.filter((group) => {
-            return group.name.toLowerCase().includes(this.filter.toLowerCase());
-        }) : []
-    }*/
-
     onClick(urlName) {
         console.log("el", urlName)
     }

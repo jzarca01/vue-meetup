@@ -2,11 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from "../store"
 
-import Dashboard from '@/views/Dashboard'
 import Login from '@/views/Login'
+import Dashboard from '@/views/Dashboard'
+import EventDetails from '@/views/EventDetails'
 
-import Groups from '@/components/Groups.vue'
-import Events from '@/components/Events.vue'
+import Groups from '@/components/Groups'
+import Events from '@/components/Events'
 
 Vue.use(Router)
 
@@ -46,6 +47,12 @@ const router = new Router({
           props: true
         }
       ]
+    },
+    {
+      path: "/events/:urlname/:id",
+      meta: { auth: true },
+      component: EventDetails,
+      name: "EventDetails"
     }
   ]
 })

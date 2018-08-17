@@ -15,6 +15,7 @@ const rootStore = {
         userGroups: [],
         upcomingEvents: [],
         calendarEvents: [],
+        selectedEvent: null
     },
     getters: {
         isAuthenticated (state) {
@@ -25,6 +26,9 @@ const rootStore = {
         },
         getUserId (state) {
             return state.userInfos.id
+        },
+        getSelectedEvent (state) {
+            return state.selectedEvent
         }
     },
     mutations: {
@@ -59,6 +63,10 @@ const rootStore = {
         },
         setCalendarEvents (state, payload) {
             state.calendarEvents = payload
+            return state
+        },
+        setSelectedEvent (state, payload) {
+            state.selectedEvent = payload.selectedEvent
             return state
         }
     },
@@ -126,7 +134,7 @@ const rootStore = {
                 })
             }
         },
-        async fetchUpcomingEvents({commit, getters}) {
+        async fetchUpcomingEvents({commit}) {
             try {
                 commit('setError', {
                     isError: false
@@ -150,7 +158,7 @@ const rootStore = {
                 })
             }
         },
-        async fetchCalendarEvents({commit, getters}) {
+        async fetchCalendarEvents({commit}) {
             try {
                 commit('setError', {
                     isError: false
@@ -169,6 +177,31 @@ const rootStore = {
                 }))
                 await commit('setCalendarEvents', hostedEvents)
                 await commit('setLoading', {
+                    isInProgress: false
+                })
+            }
+            catch(err) {
+                console.log(err)
+                commit('setError', {
+                    isError: true
+                })
+                commit('setLoading', {
+                    isInProgress: false
+                })
+            }
+        },
+        async fetchEventDetails({commit, getters}) {
+            try {
+                const selectedEvent = getters.getSelectedEvent
+                commit('setError', {
+                    isError: false
+                })
+                commit('setLoading', {
+                    isInProgress: true
+                })
+                const response = await this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}?provider=meetup`)
+                commit('setSelectedEvent', {selectedEvent : {...response.data, ...selectedEvent}})
+                commit('setLoading', {
                     isInProgress: false
                 })
             }
