@@ -29,7 +29,7 @@ Vue.use(VueAuthenticate, {
   providers: {
     meetup: {
       clientId: config.clientId,
-      redirectUri: config.redirectUri
+      redirectUri: config.redirectUrl
     }
   },
   bindRequestInterceptor: function () {
@@ -52,6 +52,8 @@ Vue.use(VueAuthenticate, {
     })
   }
 })
+
+console.log(this)
 
 /* eslint-disable no-new */
 new Vue({
