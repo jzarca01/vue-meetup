@@ -1,0 +1,18 @@
+.el-collapse {
+    width: 100%;
+    max-width: 550px;
+}
+
+.el-collapse-item__header {
+    display: inline-block !important;
+    background-color: unset !important;
+    height: auto;
+    vertical-align: middle;
+}
+
+.hosting {
+    background-color: yellowgreen;
+}
+.hosting .el-collapse-item__header:before {
+    content: "☆  ";
+}
