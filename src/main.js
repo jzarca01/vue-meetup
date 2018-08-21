@@ -29,7 +29,8 @@ Vue.use(VueAuthenticate, {
   providers: {
     meetup: {
       clientId: config.clientId,
-      redirectUri: config.redirectUrl
+      redirectUri: config.redirectUrl,
+      scope: ['basic', 'event_management']
     }
   },
   bindRequestInterceptor: function () {

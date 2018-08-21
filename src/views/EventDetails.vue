@@ -3,10 +3,11 @@
         <el-header class="nav">
             <span class="nav-link nav-left" @click="back()"><i class="el-icon-arrow-left"></i></span>
         </el-header>
-        <div v-if="state.selectedEvent.description">
-            <h1>{{state.selectedEvent.name}}</h1>
-            <div v-html="state.selectedEvent.description"></div>
-        </div>
+        <el-collapse v-if="state.selectedEvent.description">
+                <el-collapse-item :title="state.selectedEvent.name" :name="state.selectedEvent.name">
+                    <div v-html="state.selectedEvent.description"></div>
+                </el-collapse-item>
+        </el-collapse>
     </div>
 </template>
 
