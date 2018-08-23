@@ -4,13 +4,13 @@
             <span class="nav-link nav-left" @click="back()"><i class="el-icon-arrow-left"></i></span>
             <h1>{{state.selectedEvent.name}}</h1>
         </header>
-        <el-collapse v-if="state.selectedEvent.description">
+        <el-collapse v-if="state.selectedEvent.description" v-model="activePanel" accordion>
                 <el-collapse-item title="Description" name="Description">
                     <div v-html="state.selectedEvent.description"></div>
                 </el-collapse-item>
-                <el-collapse-item v-if="state.selectedEvent.attendance.length" title="RSVP" name="RSVP" style="display: block">
+                <el-collapse-item v-if="state.selectedEvent.attendance.length" :title="'Liste des participants ('+state.selectedEvent.attendance.length+')'" name="RSVP" class="rsvp-container">
                     <template v-for="attendance in state.selectedEvent.attendance">
-                        <div v-bind:key="attendance.member.id" class="rsvp_item">
+                        <div v-bind:key="attendance.member.id" class="rsvp-item">
                             <avatar :image="attendance.member.photo.thumb_link" v-if="attendance.member.photo"></avatar>
                             <p>{{ attendance.member.name }}</p>
                         </div>
@@ -44,6 +44,12 @@ export default class EventDetails extends Vue {
     @State(state => state) state
     @Mutation('setSelectedEvent') setSelectedEvent
     @Action('fetchEventDetails') fetchEventDetails
+
+    data() {
+        return {
+            activePanel: "Description"
+        }
+    }
 
     async mounted() {
         this.setSelectedEvent({selectedEvent: this.$route.params})
@@ -86,10 +92,14 @@ header span {
     box-sizing: border-box;
     float: left;
 }
-.rsvp_item {
-    display: flex;
+.rsvp-container {
+    display: block;
 }
-.rsvp_item .avatar, p {
+.rsvp-item {
+    display: flex;
+    padding: 5%;
+}
+.rsvp-item .avatar, p {
     margin: 5px;
     display: inline;
 }

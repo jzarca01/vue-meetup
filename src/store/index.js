@@ -130,7 +130,7 @@ const rootStore = {
                     commit('setError', {
                         error: {
                             isError: true,
-                            message: "Une erreur est survenue"
+                            message: "Une erreur est survenue lors d'envoi de votre participation au meetup"
                         }
                     })
                 }
@@ -160,7 +160,8 @@ const rootStore = {
                 console.log(err)
                 commit('setError', {
                     error: {
-                        isError: true
+                        isError: true,
+                        message: "Une erreur est survenue de votre profil"
                     }
                 })
                 commit('setLoading', {
@@ -188,7 +189,10 @@ const rootStore = {
             catch(err) {
                 console.log(err)
                 commit('setError', {
-                    isError: true
+                    error: {
+                        isError: true,
+                        message: "Une erreur est survenue de vos groupes"
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: false
@@ -216,7 +220,8 @@ const rootStore = {
                 console.log(err)
                 commit('setError', {
                     error: {
-                        isError: true
+                        isError: true,
+                        message: "Une erreur est survenue des prochains évènements"
                     }
                 })
                 commit('setLoading', {
@@ -254,7 +259,8 @@ const rootStore = {
                 console.log(err)
                 commit('setError', {
                     error: {
-                        isError: true
+                        isError: true,
+                        message: "Une erreur est survenue avec la récupération de vos évènements"
                     }
                 })
                 commit('setLoading', {
@@ -288,7 +294,8 @@ const rootStore = {
                 console.log(err)
                 commit('setError', {
                     error: {
-                        isError: true
+                        isError: true,
+                        message: "Une erreur est survenue avec la récupération des détails de l'évènement"
                     }
                 })
                 commit('setLoading', {
