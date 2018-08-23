@@ -1,7 +1,7 @@
 <template>
   <div class="hello" v-loading.fullscreen.lock="state.isInProgress">
     <Hello :user="state.userInfos" v-if="state.userInfos" />
-    <el-alert title="Une erreur est survenue" type="error" v-if="state.isError" closable></el-alert>
+    <el-alert :title='state.error.message ? state.error.message : "Une erreur est survenue"' type="error" v-if="state.error.isError" closable></el-alert>
     <el-row type="flex" class="row-bg" justify="space-evenly">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="Mes meetups" :params="{events: state.calendarEvents, isMine: true}" name="CalendarEvents" :disabled="!state.calendarEvents"></el-tab-pane>

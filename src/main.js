@@ -30,11 +30,12 @@ Vue.use(VueAuthenticate, {
     meetup: {
       clientId: config.clientId,
       redirectUri: config.redirectUrl,
-      scope: ['basic', 'event_management']
+      scope: ['basic', 'event_management', 'rsvp']
     }
   },
   bindRequestInterceptor: function () {
     this.$http.interceptors.request.use((config) => {
+      config.params = {...config.params, provider: "meetup"}
       if (this.isAuthenticated()) {
         config.headers['Authorization'] = [
           this.options.tokenType, this.getToken()

@@ -3,7 +3,7 @@
         <div>
             <img class="logo" src="../assets/logo.png" alt="MeetVp logo">
         </div>
-        <el-alert title="Une erreur est survenue" type="error" v-if="state.isError"></el-alert>
+        <el-alert title='state.error.message ? state.error.message : "Une erreur est survenue"' type="error" v-if="state.error.isError"></el-alert>
         <el-button class="login-button" type="danger" plain round @click="authenticate()">Login with Meetup</el-button>
     </div>
 </template>

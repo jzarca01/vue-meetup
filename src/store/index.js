@@ -10,7 +10,10 @@ const rootStore = {
     state: {
         isAuthenticated: false,
         isInProgress: false,
-        isError: false,
+        error: {
+            isError: false,
+            message: null
+        },
         userInfos: {},
         userGroups: [],
         upcomingEvents: [],
@@ -41,7 +44,7 @@ const rootStore = {
             return state
         },
         setError (state, payload) {
-            state.isError = payload.isError
+            state.error = payload.error
             return state
         },
         setLoading (state, payload) {
@@ -78,7 +81,7 @@ const rootStore = {
         },
         setError({commit, payload}) {
             commit('setError', {
-                isError: payload.isError
+                error: payload.error
             })
         },
         setLoading({commit, payload}) {
@@ -86,15 +89,68 @@ const rootStore = {
                 isInProgress: payload.isInProgress
             })
         },
-        async fetchUserInfos({commit}) {
+        async attendEvent({commit, actions}, selectedEvent) {
             try {
                 commit('setError', {
-                    isError: false
+                    error: {
+                        isError: false,
+                        message: null
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/2/member/self?provider=meetup')
+                const response = await this._vm.axios({
+                    method: 'POST',
+                    url: `http://localhost:4000/api/${selectedEvent.group.urlname}/events/${selectedEvent.id}/rsvps`,
+                    params: {
+                        agree_to_refund: true,
+                        guests: 0,
+                        opt_to_pay: true,
+                        pro_email_share_optin: false,
+                        response: "yes"
+                    }
+                })
+                actions.fetchCalendarEvents()
+                commit('setLoading', {
+                    isInProgress: false
+                })
+            }
+            catch(err) {
+                if(err.response && err.response.data.errors[0].code === "member_error") {
+                    console.log("member error")
+                    commit('setError', {
+                        error: {
+                            isError: true,
+                            message: "Vous ne pouvez pas participer à un meetup d'un groupe dont vous n'êtes pas membre"
+                        }
+                    })
+                }
+                else {
+                    commit('setError', {
+                        error: {
+                            isError: true,
+                            message: "Une erreur est survenue"
+                        }
+                    })
+                }
+                commit('setLoading', {
+                    isInProgress: false
+                })
+            }
+        },
+        async fetchUserInfos({commit}) {
+            try {
+                commit('setError', {
+                    error: {
+                        isError: false,
+                        message: null
+                    }
+                })
+                commit('setLoading', {
+                    isInProgress: true
+                })
+                const response = await this._vm.axios.get('http://localhost:4000/api/2/member/self')
                 commit('setUserInfos', response.data)
                 commit('setLoading', {
                     isInProgress: false
@@ -103,7 +159,9 @@ const rootStore = {
             catch(err) {
                 console.log(err)
                 commit('setError', {
-                    isError: true
+                    error: {
+                        isError: true
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: false
@@ -113,12 +171,15 @@ const rootStore = {
         async fetchUserGroups({commit}) {
             try {
                 commit('setError', {
-                    isError: false
+                    error: {
+                        isError: false,
+                        message: null
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/self/groups?provider=meetup')
+                const response = await this._vm.axios.get('http://localhost:4000/api/self/groups')
                 commit('setUserGroups', response.data)
                 commit('setLoading', {
                     isInProgress: false
@@ -137,12 +198,15 @@ const rootStore = {
         async fetchUpcomingEvents({commit}) {
             try {
                 commit('setError', {
-                    isError: false
+                    error: {
+                        isError: false,
+                        message: null
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/find/upcoming_events?provider=meetup')
+                const response = await this._vm.axios.get('http://localhost:4000/api/find/upcoming_events')
                 commit('setUpcomingEvents', response.data.events)
                 commit('setLoading', {
                     isInProgress: false
@@ -151,7 +215,9 @@ const rootStore = {
             catch(err) {
                 console.log(err)
                 commit('setError', {
-                    isError: true
+                    error: {
+                        isError: true
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: false
@@ -161,17 +227,21 @@ const rootStore = {
         async fetchCalendarEvents({commit}) {
             try {
                 commit('setError', {
-                    isError: false
+                    error: {
+                        isError: false,
+                        message: null
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const calendarEvents = await this._vm.axios.get('http://localhost:4000/api/self/calendar?provider=meetup')
+                const calendarEvents = await this._vm.axios.get('http://localhost:4000/api/self/calendar')
                 const hostedEvents = await Promise.all(calendarEvents.data.map(async calendarEvent => {
-                    const hosts = await this._vm.axios.get(`http://localhost:4000/api/${calendarEvent.group.urlname}/events/${calendarEvent.id}/hosts?provider=meetup`)
+                    const hosts = await this._vm.axios.get(`http://localhost:4000/api/${calendarEvent.group.urlname}/events/${calendarEvent.id}/hosts`)
 
                     if(hosts.data.find(host => parseInt(host.id) === parseInt("14259186"))) {
-                        return {...calendarEvent, isHosting: true}
+                    // if(hosts.data.find(host => parseInt(host.id) === getters.getUserId )) {
+                            return {...calendarEvent, isHosting: true}
                     }
                     return {...calendarEvent, isHosting: false}
                 }))
@@ -183,7 +253,9 @@ const rootStore = {
             catch(err) {
                 console.log(err)
                 commit('setError', {
-                    isError: true
+                    error: {
+                        isError: true
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: false
@@ -194,13 +266,20 @@ const rootStore = {
             try {
                 const selectedEvent = getters.getSelectedEvent
                 commit('setError', {
-                    isError: false
+                    error: {
+                        isError: false,
+                        message: null
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}?provider=meetup`)
-                commit('setSelectedEvent', {selectedEvent : {...response.data, ...selectedEvent}})
+                const response = await Promise.all([
+                    this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}`),
+                    this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}/rsvps`)
+                ])
+                console.log(response)
+                commit('setSelectedEvent', {selectedEvent : {...response[0].data, attendance: response[1].data, ...selectedEvent}})
                 commit('setLoading', {
                     isInProgress: false
                 })
@@ -208,7 +287,9 @@ const rootStore = {
             catch(err) {
                 console.log(err)
                 commit('setError', {
-                    isError: true
+                    error: {
+                        isError: true
+                    }
                 })
                 commit('setLoading', {
                     isInProgress: false
