@@ -4,6 +4,7 @@
             <span class="nav-link nav-left" @click="back()"><i class="el-icon-arrow-left"></i></span>
             <h1>{{state.selectedEvent.name}}</h1>
         </header>
+        <el-button plain type="primary" class="emarge-button" v-if="state.selectedEvent.hosting && isSameDay()">Emarger les participants</el-button>
         <el-collapse v-if="state.selectedEvent.description" v-model="activePanel" accordion>
                 <el-collapse-item title="Description" name="Description">
                     <div v-html="state.selectedEvent.description"></div>
@@ -11,8 +12,14 @@
                 <el-collapse-item v-if="state.selectedEvent.attendance.length" :title="'Liste des participants ('+state.selectedEvent.attendance.length+')'" name="RSVP" class="rsvp-container">
                     <template v-for="attendance in state.selectedEvent.attendance">
                         <div v-bind:key="attendance.member.id" class="rsvp-item">
-                            <avatar :image="attendance.member.photo.thumb_link" v-if="attendance.member.photo"></avatar>
-                            <p>{{ attendance.member.name }}</p>
+                            <div class="image-name">
+                                <avatar :image="attendance.member.photo.thumb_link" v-if="attendance.member.photo"></avatar>
+                                <avatar :fullname="attendance.member.name" v-if="!attendance.member.photo"></avatar>
+                                <p>{{ attendance.member.name }}</p>
+                            </div>
+                            <div class="attendance">
+                                80%
+                            </div>
                         </div>
                     </template>
                 </el-collapse-item>
@@ -51,9 +58,14 @@ export default class EventDetails extends Vue {
         }
     }
 
+    isSameDay() {
+        return this.$moment().isSame(this.state.selectedEvent.local_date, 'day')
+    }
+    
+
     async mounted() {
         this.setSelectedEvent({selectedEvent: this.$route.params})
-        this.fetchEventDetails()
+        await this.fetchEventDetails()
     }
 
     back() {
@@ -92,6 +104,10 @@ header span {
     box-sizing: border-box;
     float: left;
 }
+.emarge-button {
+    margin: 10% 2%;
+    font-weight: bold;
+}
 .rsvp-container {
     display: block;
 }
@@ -99,9 +115,18 @@ header span {
     display: flex;
     padding: 5%;
 }
-.rsvp-item .avatar, p {
+.image-name {
+    display: inline-flex;
+    width: 70%
+}
+.image-name.avatar, p {
     margin: 5px;
     display: inline;
+}
+.attendance {
+    display: inline-flex;
+    width: 25%;
+    justify-content: flex-end;
 }
 
 </style>

@@ -2,6 +2,9 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import VueAxios from 'vue-axios'
 import axios from 'axios';
+import { firebaseMutations, firebaseAction } from 'vuexfire'
+
+import config from '../config/config.json';
 
 Vue.use(Vuex);
 Vue.use(VueAxios, axios)
@@ -71,9 +74,13 @@ const rootStore = {
         setSelectedEvent (state, payload) {
             state.selectedEvent = payload.selectedEvent
             return state
-        }
+        },
+        ...firebaseMutations
     },
     actions: {
+        setItemsRef: firebaseAction(({ bindFirebaseRef }, ref) => {
+            bindFirebaseRef('items', ref, { wait: true })
+        }),
         setAuth({commit}) {
             commit('setAuthenticated', {
                 isAuthenticated: true
@@ -102,7 +109,7 @@ const rootStore = {
                 })
                 const response = await this._vm.axios({
                     method: 'POST',
-                    url: `http://localhost:4000/api/${selectedEvent.group.urlname}/events/${selectedEvent.id}/rsvps`,
+                    url: `${config.baseUrl}/api/${selectedEvent.group.urlname}/events/${selectedEvent.id}/rsvps`,
                     params: {
                         agree_to_refund: true,
                         guests: 0,
@@ -150,7 +157,7 @@ const rootStore = {
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/2/member/self')
+                const response = await this._vm.axios.get(`${config.baseUrl}/api/2/member/self`)
                 commit('setUserInfos', response.data)
                 commit('setLoading', {
                     isInProgress: false
@@ -161,7 +168,7 @@ const rootStore = {
                 commit('setError', {
                     error: {
                         isError: true,
-                        message: "Une erreur est survenue de votre profil"
+                        message: "Une erreur est survenue lors de la récupération de votre profil"
                     }
                 })
                 commit('setLoading', {
@@ -180,7 +187,7 @@ const rootStore = {
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/self/groups')
+                const response = await this._vm.axios.get(`${config.baseUrl}/api/self/groups`)
                 commit('setUserGroups', response.data)
                 commit('setLoading', {
                     isInProgress: false
@@ -191,7 +198,7 @@ const rootStore = {
                 commit('setError', {
                     error: {
                         isError: true,
-                        message: "Une erreur est survenue de vos groupes"
+                        message: "Une erreur est survenue lors de la récupération de vos groupes"
                     }
                 })
                 commit('setLoading', {
@@ -210,7 +217,7 @@ const rootStore = {
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const response = await this._vm.axios.get('http://localhost:4000/api/find/upcoming_events')
+                const response = await this._vm.axios.get(`${config.baseUrl}/api/find/upcoming_events`)
                 commit('setUpcomingEvents', response.data.events)
                 commit('setLoading', {
                     isInProgress: false
@@ -221,7 +228,7 @@ const rootStore = {
                 commit('setError', {
                     error: {
                         isError: true,
-                        message: "Une erreur est survenue des prochains évènements"
+                        message: "Une erreur est survenue lors de la récupération des prochains évènements"
                     }
                 })
                 commit('setLoading', {
@@ -240,13 +247,13 @@ const rootStore = {
                 commit('setLoading', {
                     isInProgress: true
                 })
-                const calendarEvents = await this._vm.axios.get('http://localhost:4000/api/self/calendar')
+                const calendarEvents = await this._vm.axios.get(`${config.baseUrl}/api/self/calendar`)
                 const hostedEvents = await Promise.all(calendarEvents.data.map(async calendarEvent => {
                     const hosts = await this._vm.axios.get(`http://localhost:4000/api/${calendarEvent.group.urlname}/events/${calendarEvent.id}/hosts`)
 
                     if(hosts.data.find(host => parseInt(host.id) === parseInt("14259186"))) {
                     // if(hosts.data.find(host => parseInt(host.id) === getters.getUserId )) {
-                            return {...calendarEvent, isHosting: true}
+                        return {...calendarEvent, isHosting: true}
                     }
                     return {...calendarEvent, isHosting: false}
                 }))
@@ -260,7 +267,7 @@ const rootStore = {
                 commit('setError', {
                     error: {
                         isError: true,
-                        message: "Une erreur est survenue avec la récupération de vos évènements"
+                        message: "Une erreur est survenue lors de la récupération de vos évènements"
                     }
                 })
                 commit('setLoading', {
@@ -281,8 +288,8 @@ const rootStore = {
                     isInProgress: true
                 })
                 const response = await Promise.all([
-                    this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}`),
-                    this._vm.axios.get(`http://localhost:4000/api/${selectedEvent.urlname}/events/${selectedEvent.id}/rsvps`)
+                    this._vm.axios.get(`${config.baseUrl}/api/${selectedEvent.urlname}/events/${selectedEvent.id}`),
+                    this._vm.axios.get(`${config.baseUrl}/api/${selectedEvent.urlname}/events/${selectedEvent.id}/rsvps`)
                 ])
                 console.log(response)
                 commit('setSelectedEvent', {selectedEvent : {...response[0].data, attendance: response[1].data, ...selectedEvent}})
@@ -295,7 +302,7 @@ const rootStore = {
                 commit('setError', {
                     error: {
                         isError: true,
-                        message: "Une erreur est survenue avec la récupération des détails de l'évènement"
+                        message: "Une erreur est survenue lors de la récupération des détails de l'évènement"
                     }
                 })
                 commit('setLoading', {

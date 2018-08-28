@@ -15,6 +15,7 @@ import VueAnimateNumber from 'vue-animate-number'
 import VueAxios from 'vue-axios'
 import VueAuthenticate from 'vue-authenticate'
 import axios from 'axios'
+import { cacheAdapterEnhancer, throttleAdapterEnhancer } from 'axios-extensions';
 
 import config from './config/config.json'
 
@@ -23,7 +24,9 @@ Vue.config.productionTip = false
 Vue.use(VueMomentJS, moment)
 Vue.use(VueAnimateNumber)
 Vue.use(ElementUI)
-Vue.use(VueAxios, axios)
+Vue.use(VueAxios, axios, {
+  adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter), { threshold: 2 * 1000 })
+})
 Vue.use(VueAuthenticate, {
   baseUrl: config.baseUrl,
   providers: {
@@ -54,8 +57,6 @@ Vue.use(VueAuthenticate, {
     })
   }
 })
-
-console.log(this)
 
 /* eslint-disable no-new */
 new Vue({

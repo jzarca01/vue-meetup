@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "axios-extensions": "^3.0.3",
     "element-ui": "^2.2.2",
+    "firebase": "^5.4.1",
     "moment": "^2.21.0",
+    "qs": "^6.5.2",
     "vue": "^2.5.2",
     "vue-animate-number": "^0.4.2",
     "vue-authenticate": "jzarca01/vue-authenticate",
@@ -22,7 +25,8 @@
     "vue-property-decorator": "^6.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-class": "^0.3.0"
+    "vuex-class": "^0.3.0",
+    "vuexfire": "^2.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.5",
